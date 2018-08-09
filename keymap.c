@@ -150,6 +150,7 @@ struct Keymap *Keymaps[MENU_MAX];
 struct KeymapList *NewKeymaps[MENU_MAX];
 
 static void mutt_keymap_free(struct Keymap **km);
+static void mutt_keymaplist_free(struct Keymap **km_list);
 
 #ifdef NCURSES_VERSION
 /**
@@ -1601,21 +1602,11 @@ void mutt_what_key(void)
  */
 void mutt_keys_free(void)
 {
-  struct Keymap *map = NULL;
-  struct Keymap *next = NULL;
-
   for (int i = 0; i < MENU_MAX; i++)
   {
-    for (map = Keymaps[i]; map; map = next)
-    {
-      next = map->next;
-      mutt_keymap_free(&map);
-    }
-
-    Keymaps[i] = NULL;
+    mutt_keymaplist_free(&Keymaps[i]);
   }
 }
-
 
 /**
  * mutt_keymap_free - Free a Keymap
@@ -1630,4 +1621,20 @@ static void mutt_keymap_free(struct Keymap **km)
   FREE(&(*km)->desc);
   FREE(&(*km)->keys);
   FREE(km);
+}
+
+/**
+ * mutt_keymaplist_free - Free a List of Keymaps
+ * @param km_list List of Keymaps to free
+ */
+static void mutt_keymaplist_free(struct Keymap **km_list)
+{
+  struct Keymap *map = NULL;
+  struct Keymap *next = NULL;
+  for (map = (*km_list); map; map = next)
+  {
+    next = map->next;
+    mutt_keymap_free(&map);
+  }
+  *km_list = NULL;
 }
