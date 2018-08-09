@@ -149,6 +149,8 @@ int LastKey; /**< contains the last key the user pressed */
 struct Keymap *Keymaps[MENU_MAX];
 struct KeymapList *NewKeymaps[MENU_MAX];
 
+static void mutt_keymap_free(struct Keymap **km);
+
 #ifdef NCURSES_VERSION
 /**
  * struct Extkey - Map key names from NeoMutt's style to Curses style
@@ -388,10 +390,7 @@ static enum CommandResult km_bind_err(const char *s, enum MenuType menu, int op,
         }
         len = tmp->eq;
         next = tmp->next;
-        FREE(&tmp->macro);
-        FREE(&tmp->keys);
-        FREE(&tmp->desc);
-        FREE(&tmp);
+        mutt_keymap_free(&tmp);
         tmp = next;
       } while (tmp && len >= pos);
       map->eq = len;
@@ -1610,13 +1609,25 @@ void mutt_keys_free(void)
     for (map = Keymaps[i]; map; map = next)
     {
       next = map->next;
-
-      FREE(&map->macro);
-      FREE(&map->desc);
-      FREE(&map->keys);
-      FREE(&map);
+      mutt_keymap_free(&map);
     }
 
     Keymaps[i] = NULL;
   }
+}
+
+
+/**
+ * mutt_keymap_free - Free a Keymap
+ * @param km Keymap to free
+ */
+static void mutt_keymap_free(struct Keymap **km)
+{
+  if (!km || !*km)
+    return;
+
+  FREE(&(*km)->macro);
+  FREE(&(*km)->desc);
+  FREE(&(*km)->keys);
+  FREE(km);
 }
