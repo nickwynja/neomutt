@@ -989,7 +989,7 @@ static int mbox_mbox_open_append(struct Mailbox *m, OpenMailboxFlags flags)
   if (!adata)
     return -1;
 
-  adata->fp = mutt_file_fopen(mailbox_path(m), (flags & MUTT_NEWFOLDER) ? "w" : "a");
+  adata->fp = mutt_file_fopen(mailbox_path(m), (flags & MUTT_NEWFOLDER) ? "w+" : "a+");
   if (!adata->fp)
   {
     mutt_perror(mailbox_path(m));
