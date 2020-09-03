@@ -2558,7 +2558,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         break;
 
       case OP_NEXT_LINE:
-        if (rd.line_info[rd.curline].offset < (rd.sb.st_size - 1))
+        if (rd.topline < rd.last_line - 1)
         {
           rd.topline++;
           if (rd.hide_quoted)
